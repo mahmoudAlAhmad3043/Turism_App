@@ -1,0 +1,351 @@
+
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author Mahmoud
+ */
+public class DeletePhotogragherGUI extends javax.swing.JFrame implements ClientInterface{
+    private AppInterface app;
+    final DefaultListModel<String> l1 = new DefaultListModel<>(); 
+    final JList<String> list1 = new JList<>(l1);
+    ArrayList<PhotogragherInterface> photographers;
+    int ph_id = -1;
+     JLabel fNameLabel ;
+     JLabel sNameLabel ;
+     JLabel accountValLabel ;
+     JLabel percentValLabel ;
+    int selectedIndex;
+    /**
+     * Creates new form DeletePhotogragherGUI
+     */
+    public DeletePhotogragherGUI() throws RemoteException, NotBoundException {
+        initComponents();
+        this.setLocation(450,200);
+        this.setTitle("Delete Photographer");
+        getTheService();
+        UnicastRemoteObject.exportObject(this, 0);
+        fNameLabel = new JLabel("first name        :    ----");
+        sNameLabel = new JLabel("last name  :    ----");
+        accountValLabel = new JLabel("account             :    0.0");
+        percentValLabel = new JLabel("percentage             :    0.0");
+        fNameLabel.setBounds(100,150,200,15);
+        sNameLabel.setBounds(100,180,200,15);
+        accountValLabel.setBounds(100,210,200,15);
+        percentValLabel.setBounds(100,240,200,15);
+        this.add(fNameLabel);
+        this.add(sNameLabel);
+        this.add(accountValLabel);
+        this.add(percentValLabel);
+        
+        photographers =  app.sendAllPhotographers();
+        for(PhotogragherInterface ph:photographers){
+            l1.addElement(ph.getFirstName()+" "+ph.getSecondName());
+        }
+        app.addClient(this);    
+          list1.setBounds(105,60,300,80);
+        this.add(list1);
+          JScrollPane scrollPane = new JScrollPane(list1);
+          this.add(scrollPane);
+          scrollPane.setBounds(100, 60, 310, 80);
+          list1.addListSelectionListener(new ListSelectionListener() {
+          private boolean isEventHandled = false;
+          public void valueChanged(ListSelectionEvent e) {
+              if (!e.getValueIsAdjusting() && !isEventHandled ) { 
+                  try {
+                      showInformation();
+                  } catch (RemoteException ex) {
+                      Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+                  }
+              }
+
+          }
+         });
+         
+          this.addWindowListener(new WindowAdapter()  {
+            public void windowClosing(WindowEvent e)  {
+                
+                try {
+                    f();
+                } catch (RemoteException ex) {
+                    Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        });
+    }
+    public void f() throws RemoteException{
+        app.logout(this);
+        System.exit(0);
+    }
+    
+    private void getTheService() throws RemoteException, NotBoundException{
+        PropertiesDevice pd = PropertiesDevice.getDevice();
+        Registry reg = LocateRegistry.getRegistry(pd.getIp(),1099);
+        app = (AppInterface) reg.lookup(AppInterface.APP_NAME);
+    }
+    private void showInformation() throws RemoteException{
+                   selectedIndex = list1.getSelectedIndex();
+                   if(selectedIndex != -1){
+                   fNameLabel.setText("first name        :    "+photographers.get(selectedIndex).getFirstName());
+                   sNameLabel.setText("last name  :    "+photographers.get(selectedIndex).getSecondName());
+                   accountValLabel.setText("account             :    "+photographers.get(selectedIndex).getAccount()+"");
+                   percentValLabel.setText("percentage             :    "+photographers.get(selectedIndex).getPercent()+"");
+                   ph_id = photographers.get(selectedIndex).getId();
+                   }
+    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        deleteButton = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        backButton = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        deleteButton.setBackground(new java.awt.Color(0, 153, 204));
+        deleteButton.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        deleteButton.setForeground(new java.awt.Color(255, 255, 255));
+        deleteButton.setText("Delete");
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Photographer:");
+
+        backButton.setBackground(new java.awt.Color(0, 153, 204));
+        backButton.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        backButton.setForeground(new java.awt.Color(255, 255, 255));
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(104, 104, 104)
+                        .addComponent(jLabel5))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(153, 153, 153)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(backButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(deleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(182, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 215, Short.MAX_VALUE)
+                .addComponent(deleteButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(backButton)
+                .addGap(5, 5, 5))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        // TODO add your handling code here:
+        boolean result = false;
+        if(ph_id == -1){
+            JOptionPane.showMessageDialog(this,"Selected photographer not found");
+        }else{
+            if(selectedIndex !=-1){
+                try {
+                     result = app.deletePhotographer(photographers.get(selectedIndex));
+                } catch (RemoteException ex) {
+                    Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if(result){
+//                   l1.remove(selectedIndex);
+                    try {
+                        System.out.println(list1.getSelectedValue());
+                        String name = list1.getSelectedValue();
+                        app.refreshPhotographers(app.sendAllPhotographers());
+//                        app.sendPhotographerId(photographers.get(selectedIndex),selectedIndex);
+                        app.sendMessageToAll("Management deleted the photographer "+name);
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+//                   fNameLabel.setText("---");
+//                   sNameLabel.setText("---");
+//                   accountValLabel.setText("0.0");
+//                   percentValLabel.setText("0.0");
+//                   ph_id = -1;
+                }else{
+                    JOptionPane.showMessageDialog(this,"Failed to delete photographer");
+                }
+            }
+        }
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        try {
+            // TODO add your handling code here:
+            new PhotogragherManagementGUI().setVisible(true);
+            app.logout(this);
+            this.dispose();
+        } catch (RemoteException ex) {
+            Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NotBoundException ex) {
+            Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new DeletePhotogragherGUI().setVisible(true);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NotBoundException ex) {
+                    Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
+    private javax.swing.JButton deleteButton;
+    private javax.swing.JLabel jLabel5;
+    // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void recieveManager(String firstName, String secondName, double account, double percent) throws RemoteException {
+                Manager manager = Manager.getManager();
+        manager.setAccount(account);
+        manager.setPercent(percent);
+        manager.setFirstName(firstName);
+        manager.setSecondName(secondName);
+    }
+
+ 
+
+    @Override
+    public void reciveIdPhotographer(PhotogragherInterface ph,int selectedIndex) throws RemoteException {        
+//        l1.remove(selectedIndex);
+        SwingUtilities.invokeLater(() -> {
+            try { 
+                JOptionPane.showMessageDialog(this, "Management deleted the photographer "+ph.getFirstName()+" "+ph.getSecondName());
+            } catch (RemoteException ex) {
+                Logger.getLogger(DeletePhotogragherGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+//        photographers.remove(selectedIndex);
+//        app.refreshPhotographers(app.sendAllPhotographers());
+    }
+    
+    @Override
+    public void reciveMessage(String message) throws RemoteException {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this,message);
+        });
+//        app.refreshPhotographers(app.sendAllPhotographers());
+    }
+
+    @Override
+    public void recivePhotographers(ArrayList<PhotogragherInterface> phs) throws RemoteException {
+         photographers = phs;
+         l1.removeAllElements();
+        for(PhotogragherInterface ph:photographers){
+            l1.addElement(ph.getFirstName()+" "+ph.getSecondName());
+        }
+        fNameLabel.setText("first name        :    ----");
+        sNameLabel.setText("last name  :    ----");
+        accountValLabel.setText("account             :    0.0");
+        percentValLabel.setText("percentage             :    0.0");
+        ph_id = -1;
+    }
+
+    @Override
+    public void reciveGuides(ArrayList<TourGuidesInterface> gus) throws RemoteException {
+    }
+
+    @Override
+    public void reciveValueCoin(double value, String type) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void reciveSales(ArrayList<SalesInterface> sales) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void reciveOutlayList(ArrayList<Outlay> outlayList) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+}
